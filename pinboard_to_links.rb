@@ -3,15 +3,14 @@ require "net/http"
 require "uri"
 require "nokogiri"
 
-USERNAME, PASSWORD = File.read(File.expand_path("~/.auth/pinboard")).split(" ").map(&:strip)
+TOKEN = File.read(File.expand_path("~/.auth/pinboard")).strip
 
 app = Proc.new { |env|
   uri = URI.parse("https://api.pinboard.in/v1/posts/all/")
 
   http = Net::HTTP.new(uri.host, uri.port)
   http.use_ssl = true
-  request = Net::HTTP::Get.new(uri.request_uri)
-  request.basic_auth USERNAME, PASSWORD
+  request = Net::HTTP::Get.new("https://api.pinboard.in/v1/posts/all/?auth_token=#{TOKEN}")
   response = http.request(request)
 
   results = Nokogiri(response.body)
